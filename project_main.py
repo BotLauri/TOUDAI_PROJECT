@@ -34,6 +34,7 @@ def kuramoto_network_model(t, phi, N, K, C, omega, alpha):
     for i in range(N):
         for j in range(N):
             sum[i] += A[i][j] * cmath.sin(phi[j] - phi[i] + alpha)
+            print(cmath.sin(phi[j] - phi[i] + alpha))
     phidot[i] = omega[i] + K/C * sum[i]
     return phidot
 
