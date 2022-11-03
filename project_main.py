@@ -34,18 +34,19 @@ def kuramoto_network_model(t, phi, N, K, C, omega, alpha):
     for i in range(N):
         for j in range(N):
             sum[i] += A[i][j] * cmath.sin(phi[j] - phi[i] + alpha)
-            print(cmath.sin(phi[j] - phi[i] + alpha))
-    phidot[i] = omega[i] + K/C * sum[i]
+            #print(cmath.sin(phi[j] - phi[i] + alpha))
+        phidot[i] = omega[i] + K/C * sum[i]
     return phidot
 
 # Simulation. 
 t_end = 1000 # Calculation terminates at t = t_end.
-steps = 100
+steps = 10
 t_eval = np.linspace(0, t_end, steps)
 # Solve the initial value problem.
 res = solve_ivp(fun=kuramoto_network_model, args=(N, K, C, omega, alpha,), y0=ic, 
                 t_span=(0, t_end), t_eval=t_eval, atol=1e-6, rtol=1e-3)
 
+print(res)
 print(omega)
 print(ic)
 print(A)
