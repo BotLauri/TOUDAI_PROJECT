@@ -4,11 +4,11 @@ from scipy.integrate import solve_ivp
 from matplotlib import pyplot as plt
 
 # Parameters.
-N = 100 # Number of oscillators.
+N = 100 # Number of oscillators. 
 C = 2500 # Number of connections. 
-K = 1000 # Coupling constant.
-seed = 2022 # Random seed.
-alpha = 0.3 # Phase shift. 
+K = 5000 # Coupling constant. 
+seed = 2022 # Random seed. 
+alpha = 0.1 # Phase shift. 
 
 # Initialization.
 rng = np.random.default_rng(seed=seed) # Generator. 
@@ -67,4 +67,5 @@ psi_hist = np.angle(op_hist) # history of Psi(t)
 plt.plot(t,r_hist)
 plt.xlabel('t',fontsize=18)
 plt.ylabel('r',fontsize=18)
+plt.title('Coupling constant for α = ' + str(alpha))
 plt.show()
