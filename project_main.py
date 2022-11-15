@@ -1,17 +1,25 @@
 import numpy as np
-import cmath
 import random
 from scipy.integrate import solve_ivp
 from matplotlib import pyplot as plt
 
-# Parameters.
+# General parameters.
 N = 10 # Number of oscillators. 
-C = 50 # Number of connections. 
-K = 250 # Coupling constant. 
+C = 25 # Number of connections. 
+K = 50 # Coupling constant. 
 seed = 2022 # Random seed. 
 alpha = 0.1 # Phase shift. 
+t_end = 200 # Calculation terminates at t = t_end.
+steps = 1000 # Number of time steps in simulation. 
+
+# Optimization parameters. 
+iterations = 10 # Optimization iterations. 
+element_avg = int(steps*0.5) # Number of elements in the averaging over time (r_avg).
+updates_per_iteration = int(C*0.2) # Number of connections removed / added in each iteration. 
+max_iterations_without_improvement = 5 # Self explanatory. 
 
 # Initialization.
+best_r = 0
 random.seed(seed)
 rng = np.random.default_rng(seed=seed)
 # Initial values of omega follow normal distribution with mean = 0 and sd = 1.
@@ -20,7 +28,6 @@ omega = rng.normal(loc=0, scale=1, size=N)
 ic = rng.random(size=(N,)) * 2 * np.pi
 
 # Initialize the network matrix. 
-# Maybe change to list of tuples. Should be a lot quicker. Scrap?
 A = np.zeros((N, N))
 c = 0
 while c < C:
@@ -29,6 +36,7 @@ while c < C:
     if A[x][y] != 1:
         A[x][y] = 1
         c += 1
+best_A = A
 
 def kuramoto_network_model(t, phi, N, K, C, omega, alpha):
     # Calculate one step in the Kuramoto model. 
@@ -37,23 +45,14 @@ def kuramoto_network_model(t, phi, N, K, C, omega, alpha):
     phidot = omega + K/C*sums
     return phidot
 
-# Set up optimization. 
-iterations = 1
-best_r = 0
-best_A = A
-t_end = 200 # Calculation terminates at t = t_end.
-steps = 1000
-element_avg = int(steps*0.5) # Number of elements in the averaging over time. 
-updates_per_iteration = int(C*0.2)
-max_iterations_without_improvement = 5
-
 # Simulation with elitism: If a number of iternations since last increase has passed, revert to old A.  
 it_nr = 0
 for it in range(iterations):
     # If no improvement, revert to A. 
-    if (it_nr > 5):
+    if (it_nr > max_iterations_without_improvement):
         A = best_A
         it_nr = 0
+        print(best_r)
 
     # Solve the initial value problem.
     t_eval = np.linspace(0, t_end, steps)
@@ -69,6 +68,7 @@ for it in range(iterations):
     if (avg_r > best_r):
         best_r = avg_r
         best_A = A
+        it_nr = 0
         print(best_r)
 
     # Update the A matrix.
@@ -86,9 +86,9 @@ for it in range(iterations):
 
     it_nr = it_nr + 1
 
-# Solve the initial value problem.
+# Solve the initial value problem for plotting. 
 A = best_A
-t_eval = np.linspace(0, t_end, steps)
+#t_eval = np.linspace(0, t_end, steps)
 res = solve_ivp(fun=kuramoto_network_model, args=(N, K, C, omega, alpha,), y0=ic, 
                     t_span=(0, t_end), t_eval=t_eval, atol=1e-8, rtol=1e-8)
 
@@ -104,5 +104,5 @@ print(avg_r)
 plt.plot(t,r_hist)
 plt.xlabel('t',fontsize=18)
 plt.ylabel('r',fontsize=18)
-plt.title('Coupling constant for α = ' + str(alpha))
+plt.title('Coupling constant for N, C, K = ' + str(N) + ', ' + str(C) + ', ' + str(K) + ' and α = ' + str(alpha))
 plt.show()
