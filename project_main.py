@@ -15,7 +15,7 @@ steps = 1000 # Number of time steps in simulation.
 # Optimization parameters. 
 iterations = 10 # Optimization iterations. 
 element_avg = int(steps*0.5) # Number of elements in the averaging over time (r_avg).
-updates_per_iteration = int(C*0.2) # Number of connections removed / added in each iteration. 
+updates_per_iteration = int(C*0.2) # Number of connections removed/added in each iteration. 
 max_iterations_without_improvement = 5 # Self explanatory. 
 
 # Initialization.
@@ -36,9 +36,8 @@ while c < C:
     if A[x][y] != 1:
         A[x][y] = 1
         c += 1
-best_A = A
 
-def kuramoto_network_model(t, phi, N, K, C, omega, alpha):
+def kuramoto_network_model(t, phi, N, K, C, omega, alpha, A):
     # Calculate one step in the Kuramoto model. 
     phi_tile = np.tile(phi,(N, 1))
     sums = np.sum(A*(np.sin(phi_tile.T - phi_tile + alpha) - np.sin(alpha)), axis=0) # Is this phi_j - phi_i?
@@ -50,13 +49,13 @@ it_nr = 0
 for it in range(iterations):
     # If no improvement, revert to A. 
     if (it_nr > max_iterations_without_improvement):
-        A = best_A
+        A = best_A.copy() # Deep copy. 
         it_nr = 0
         print(best_r)
 
     # Solve the initial value problem.
     t_eval = np.linspace(0, t_end, steps)
-    res = solve_ivp(fun=kuramoto_network_model, args=(N, K, C, omega, alpha,), y0=ic, 
+    res = solve_ivp(fun=kuramoto_network_model, args=(N, K, C, omega, alpha, A,), y0=ic, 
                     t_span=(0, t_end), t_eval=t_eval, atol=1e-8, rtol=1e-8)
 
     # Calculate avg_r. 
@@ -67,7 +66,7 @@ for it in range(iterations):
     # If best update accordingly. 
     if (avg_r > best_r):
         best_r = avg_r
-        best_A = A
+        best_A = A.copy() # Deep copy. 
         it_nr = 0
         print(best_r)
 
@@ -87,18 +86,14 @@ for it in range(iterations):
     it_nr = it_nr + 1
 
 # Solve the initial value problem for plotting. 
-A = best_A
-#t_eval = np.linspace(0, t_end, steps)
-res = solve_ivp(fun=kuramoto_network_model, args=(N, K, C, omega, alpha,), y0=ic, 
+res = solve_ivp(fun=kuramoto_network_model, args=(N, K, C, omega, alpha, best_A), y0=ic, 
                     t_span=(0, t_end), t_eval=t_eval, atol=1e-8, rtol=1e-8)
-
-# Stolen code^TM. Thanks Kori. 
 t = res.t # history of time
 theta_hist = res.y # history of theta
 op_hist = np.exp(1j * res.y).sum(axis=0) / N # history of order parameter
 r_hist = np.abs(op_hist) # history of r(t)
 psi_hist = np.angle(op_hist) # history of Psi(t)
-avg_r = np.sum(r_hist[-element_avg:])/element_avg # Average of last elements of r(t).
+avg_r = np.sum(r_hist[:-element_avg])/element_avg # Average of last elements of r(t).
 print(avg_r)
 
 plt.plot(t,r_hist)
