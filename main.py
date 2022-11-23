@@ -75,7 +75,7 @@ def A_init(N):
 # Calculate one step in the Kuramoto model. 
 def kuramoto_network_model(t, phi, N, K, C, omega, alpha, A):
     phi_tile = np.tile(phi,(N, 1))
-    sums = np.sum(A*(np.sin(phi_tile.T - phi_tile + alpha) - np.sin(alpha)), axis=0) # Is this phi_j - phi_i?
+    sums = np.sum(A*(np.sin(phi_tile.T - phi_tile + alpha) - np.sin(alpha)), axis=0)
     phidot = omega + K/C*sums
     return phidot
 
