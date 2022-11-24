@@ -9,22 +9,44 @@ def kuramoto_network_model(t, phi, N, K, C, omega, alpha, A):
     phidot = omega + K/C*sums
     return phidot
 
-# OBS: Always random. 
-def simulation(A, steps, C, t_end, kuramoto_network_model, N, K, omega, alpha, ic, is_directed, seed=None):
-    if seed is None:
-        random.seed(seed)
-        rng = np.random.default_rng(seed=seed)
-
+# Simulation with elitism: If a number of iternations since last increase has passed, revert to old A. 
+def simulation(steps, t_end, C, N, K, omega, alpha, ic, iterations, is_directed, seed=None):
     # Optimization parameters. 
-    iterations = 100 # Optimization iterations. 
     element_avg = int(steps*0.5) # Number of elements in the averaging over time (r_avg).
     updates_per_iteration = int(C*0.2) # Number of connections removed/added in each iteration. 
     if updates_per_iteration == 0:
         updates_per_iteration = 1
     max_iterations_without_improvement = 5
 
-    # Simulation with elitism: If a number of iternations since last increase has passed, revert to old A. 
-    # TODO: ADD POSSIBILITY FOR SYMMETRIC A. 
+    if seed is None:
+        random.seed(seed)
+        rng = np.random.default_rng(seed=seed)
+
+    # Initialize the network matrix. Undirected graph is not allowed to have connections to the same node. 
+    if is_directed:
+        A = np.zeros((N, N))
+        c = 0
+        while c < C:
+            x = rng.integers(0, N)
+            y = rng.integers(0, N)
+            if A[x][y] != 1:
+                A[x][y] = 1
+                c += 1
+    else:
+        if C % 2 == 1: # Can not have a half connection. 
+            C += 1
+        A = np.zeros((N, N))
+        c = 0
+        while c < C:
+            x = rng.integers(0, N)
+            y = rng.integers(0, N)
+            while x == y:
+                y = rng.integers(0, N) # Make sure the connection is between different nodes. 
+            if A[x][y] != 1:
+                A[x][y] = 1
+                A[y][x] = 1
+                c += 2
+
     best_r = 0
     it_nr = 0
     avg_r_hist = []
@@ -68,6 +90,18 @@ def simulation(A, steps, C, t_end, kuramoto_network_model, N, K, omega, alpha, i
                 A[x][y] = 1
         else:
             nonzero_indices = np.nonzero(A)
+            zero_indices = np.nonzero(A == 0) # Gives the zeroes instead.
+            # Choose a couple of connections to remove and add.
+            remove_connection = random.sample(range(0, C), updates_per_iteration)
+            add_connection = random.sample(range(0, N**2-C), updates_per_iteration)
+            for i, j in zip(remove_connection, add_connection):
+                x, y = nonzero_indices[0][i], nonzero_indices[1][i]
+                a, b = zero_indices[0][j], zero_indices[1][j]
+                if x != y and a != b: # Undirected graph is not allowed to have connections to the same node. 
+                    A[x][y] = 0
+                    A[y][x] = 0
+                    A[a][b] = 1
+                    A[b][a] = 1
 
         it_nr = it_nr + 1
         avg_r_hist.append(avg_r)
