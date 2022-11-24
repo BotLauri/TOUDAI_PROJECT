@@ -22,6 +22,8 @@ def simulation(steps, t_end, C, N, K, omega, alpha, ic, iterations, is_directed,
         random.seed(seed)
         rng = np.random.default_rng(seed=seed)
 
+    # TODO: Make the initialization smarter by only looking at zeroes.
+    # Will make it faster in situations where almost all nodes have connections. 
     # Initialize the network matrix. Undirected graph is not allowed to have connections to the same node. 
     if is_directed:
         A = np.zeros((N, N))
@@ -29,6 +31,8 @@ def simulation(steps, t_end, C, N, K, omega, alpha, ic, iterations, is_directed,
         while c < C:
             x = rng.integers(0, N)
             y = rng.integers(0, N)
+            while x == y:
+                y = rng.integers(0, N) # Make sure the connection is between different nodes. 
             if A[x][y] != 1:
                 A[x][y] = 1
                 c += 1
@@ -82,12 +86,12 @@ def simulation(steps, t_end, C, N, K, omega, alpha, ic, iterations, is_directed,
             # Choose a couple of connections to remove and add.
             remove_connection = random.sample(range(0, C), updates_per_iteration)
             add_connection = random.sample(range(0, N**2-C), updates_per_iteration)
-            for i in remove_connection:
+            for i, j in zip(remove_connection, add_connection):
                 x, y = nonzero_indices[0][i], nonzero_indices[1][i]
-                A[x][y] = 0
-            for i in add_connection:
-                x, y = zero_indices[0][i], zero_indices[1][i]
-                A[x][y] = 1
+                a, b = zero_indices[0][i], zero_indices[1][i]
+                if x != y and a != b:
+                    A[x][y] = 0
+                    A[a][b] = 1
         else:
             nonzero_indices = np.nonzero(np.triu(A, 1)) # Symmetry -> above the diagonal is enough. 
             zero_indices = np.nonzero(A == 0) # Gives the zeroes instead.
@@ -102,11 +106,10 @@ def simulation(steps, t_end, C, N, K, omega, alpha, ic, iterations, is_directed,
             for i, j in zip(remove_connection, add_connection):
                 x, y = nonzero_indices[0][i], nonzero_indices[1][i]
                 a, b = zero_indices[j]
-                if a != b: # Undirected graph is not allowed to have connections to the same node. 
-                    A[x][y] = 0
-                    A[y][x] = 0 # Lower triangular matrix. 
-                    A[a][b] = 1
-                    A[b][a] = 1 # Lower triangular matrix. 
+                A[x][y] = 0
+                A[y][x] = 0 # Lower triangular matrix. 
+                A[a][b] = 1
+                A[b][a] = 1 # Lower triangular matrix. 
 
         it_nr = it_nr + 1
         avg_r_hist.append(avg_r)

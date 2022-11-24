@@ -16,8 +16,8 @@ import optimize
 # Alpha = 0. C = 10/100. 
 
 # General parameters.
-N = 6 # Number of oscillators. 
-C = 5*2 # Number of connections. 
+N = 7 # Number of oscillators. 
+C = 6*2 # Number of connections. 
 K = C*2 # Coupling constant. 
 alpha = 0.0 # Phase shift. 
 t_end = 200 # Calculation terminates at t = t_end.
