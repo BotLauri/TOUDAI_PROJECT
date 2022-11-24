@@ -2,6 +2,7 @@ import numpy as np
 import random
 from scipy.integrate import solve_ivp
 from matplotlib import pyplot as plt
+import scipy
 import plot
 import optimize
 
@@ -15,8 +16,8 @@ import optimize
 # Alpha = 0. C = 10/100. 
 
 # General parameters.
-N = 5 # Number of oscillators. 
-C = 4*2 # Number of connections. 
+N = 6 # Number of oscillators. 
+C = 5*2 # Number of connections. 
 K = C*2 # Coupling constant. 
 alpha = 0.0 # Phase shift. 
 t_end = 200 # Calculation terminates at t = t_end.
@@ -39,8 +40,9 @@ ic = rng.random(size=(N,)) * 2 * np.pi
 A, best_A, avg_r_hist, best_r_hist = optimize.simulation(steps, t_end, C, N, K, omega, alpha, ic, iterations, is_directed)
 
 # Do we have a connected network? 
-# If one eigenvalue is one then we have a connected network.
-eigenvalues, eigenvectors = np.linalg.eig(best_A)
+# If one eigenvalue is one (of the laplacian matrix) then we have a connected network.
+laplacian = scipy.sparse.csgraph.laplacian(best_A)
+eigenvalues, eigenvectors = np.linalg.eig(laplacian)
 print(best_A)
 print(eigenvalues)
 

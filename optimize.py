@@ -89,19 +89,24 @@ def simulation(steps, t_end, C, N, K, omega, alpha, ic, iterations, is_directed,
                 x, y = zero_indices[0][i], zero_indices[1][i]
                 A[x][y] = 1
         else:
-            nonzero_indices = np.nonzero(A)
+            nonzero_indices = np.nonzero(np.triu(A, 1)) # Symmetry -> above the diagonal is enough. 
             zero_indices = np.nonzero(A == 0) # Gives the zeroes instead.
+            temp = []
+            for i, j in zip(zero_indices[0], zero_indices[1]): # Only care about zeroes above the diagonal.
+                if i < j:
+                    temp.append((i, j))
+            zero_indices = temp
             # Choose a couple of connections to remove and add.
-            remove_connection = random.sample(range(0, C), updates_per_iteration)
-            add_connection = random.sample(range(0, N**2-C), updates_per_iteration)
+            remove_connection = random.sample(range(0, int(C/2)), updates_per_iteration)
+            add_connection = random.sample(range(0, len(zero_indices)), updates_per_iteration)
             for i, j in zip(remove_connection, add_connection):
                 x, y = nonzero_indices[0][i], nonzero_indices[1][i]
-                a, b = zero_indices[0][j], zero_indices[1][j]
-                if x != y and a != b: # Undirected graph is not allowed to have connections to the same node. 
+                a, b = zero_indices[j]
+                if a != b: # Undirected graph is not allowed to have connections to the same node. 
                     A[x][y] = 0
-                    A[y][x] = 0
+                    A[y][x] = 0 # Lower triangular matrix. 
                     A[a][b] = 1
-                    A[b][a] = 1
+                    A[b][a] = 1 # Lower triangular matrix. 
 
         it_nr = it_nr + 1
         avg_r_hist.append(avg_r)
