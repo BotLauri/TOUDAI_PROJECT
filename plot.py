@@ -32,10 +32,10 @@ def best_r(iterations, best_r_hist):
 def graph(A, N, is_directed):
     G = nx.DiGraph() 
     for i in range(N):
-        G.add_node(i)
+        G.add_node(i+1)
         for j in range(N):
             if A[i][j] != 0: 
-                G.add_edge(i, j, weight = A[i][j])
+                G.add_edge(i+1, j+1, weight = A[i][j])
 
     plt.title('Graph displaying the oscillators and their repective connections.')
     if is_directed:

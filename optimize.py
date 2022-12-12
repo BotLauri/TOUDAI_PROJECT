@@ -16,15 +16,16 @@ def simulation(steps, t_end, C, N, K, omega, alpha, ic, iterations, is_directed,
     updates_per_iteration = int(C*0.2) # Number of connections removed/added in each iteration. 
     if updates_per_iteration == 0:
         updates_per_iteration = 1
-    max_iterations_without_improvement = 5
+    max_iterations_without_improvement = 10
 
     if seed is None:
         random.seed(seed)
         rng = np.random.default_rng(seed=seed)
 
-    # TODO: Make the initialization smarter by only looking at zeroes.
+    # TODO: Make the initialization smarter by only looking at zeroes. 
+    # TODO: Make initialization into its own file?
     # Will make it faster in situations where almost all nodes have connections. 
-    # Initialize the network matrix. Undirected graph is not allowed to have connections to the same node. 
+    # Initialize the network matrix. Undirected graph is not allowed to have connections to the same node.
     if is_directed:
         A = np.zeros((N, N))
         c = 0

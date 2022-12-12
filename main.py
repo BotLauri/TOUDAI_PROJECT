@@ -10,19 +10,21 @@ import optimize
 # Try all possibilites for N = 3,4. Find which setups are optimal. Different alpha=0.1, 0.2?
 # Change omega to uniformly spaced omega. 
 # Minimum number of connections is N-1. 
-# Do we get series or branching network for N=4? (N!/2)
+# Do we get series or branching network for N=4? (N!/2) Permutations but half are the same?
 # Sort different networks by their optimal r values. 
 # Later maybe look at C?
+# Negative alpha -> nodes with most connections reverse order?
+# N!/2 + trees. (N!/2 are permutations minus mirror symmetry.)
 
 # General parameters.
-N = 20 # Number of oscillators. 
-C = 19*2 # Number of connections. 
+N = 7 # Number of oscillators. 
+C = (N - 1)*2 # Number of connections. 
 K = C*2 # Coupling constant. 
-alpha = 0.0 # Phase shift. 
+alpha = 0.5 # Phase shift. 
 t_end = 200 # Calculation terminates at t = t_end.
 steps = 1000 # Number of time steps in simulation. 
-iterations = 15 # Optimization iterations. 
-is_directed = True
+iterations = 50 # Optimization iterations. 
+is_directed = False
 
 # Initialization.
 #seed = 2022
@@ -31,7 +33,7 @@ is_directed = True
 rng = np.random.default_rng()
 # Initial values of omega follow normal distribution with mean = 0 and sd = 1.
 #omega = rng.normal(loc=0, scale=1, size=N)
-omega = np.linspace(0, 0.1*N, num=N)
+omega = np.linspace(0, 1, num=N)
 # Initial values of phi follow uniform distribution. 
 ic = rng.random(size=(N,)) * 2 * np.pi
 
@@ -44,6 +46,7 @@ laplacian = scipy.sparse.csgraph.laplacian(best_A)
 eigenvalues, eigenvectors = np.linalg.eig(laplacian)
 print(best_A)
 print(eigenvalues)
+#print(eigenvectors)
 
 # Solve the initial value problem for plotting. 
 t_eval = np.linspace(0, t_end, steps)
