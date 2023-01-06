@@ -37,7 +37,7 @@ def graph(A, N, is_directed):
             if A[i][j] != 0: 
                 G.add_edge(i+1, j+1, weight = A[i][j])
 
-    plt.title('Graph displaying the oscillators and their repective connections.')
+    plt.title('Graph displaying the oscillators and their respective connections.')
     if is_directed:
         nx.draw_shell(G, with_labels=True, font_weight='bold')
     else:

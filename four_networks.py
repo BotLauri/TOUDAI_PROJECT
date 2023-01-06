@@ -7,8 +7,8 @@ import plot
 # General parameters.
 N = 4 # Number of oscillators. 
 C = 3 # Number of connections. 
-K = C*2 # Coupling constant. 
-alpha = 0.0 # Phase shift. 
+K = C # Coupling constant. 
+alpha = 1.0 # Phase shift. 
 t_end = 200 # Calculation terminates at t = t_end.
 steps = 1000 # Number of time steps in simulation. 
 element_avg = int(steps*0.5) # Number of elements in the averaging over time (r_avg).
@@ -23,17 +23,17 @@ ic = rng.random(size=(N,)) * 2 * np.pi
 
 # The possible networks.
 As = []
-As.append([[0, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]]) # Tree, root 1. Picture 2. 
-As.append([[0, 1, 0, 0], [1, 0, 1, 1], [0, 1, 0, 0], [0, 1, 0, 0]]) # Tree, root 2. Picture 11.
-As.append([[0, 0, 1, 0], [0, 0, 1, 0], [1, 1, 0, 1], [0, 0, 1, 0]]) # Tree, root 3. Picture 6.
-As.append([[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [1, 1, 1, 0]]) # Tree, root 4. Picture 10.
+As.append([[0, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]]) # Star, root 1. Picture 2. 
+As.append([[0, 1, 0, 0], [1, 0, 1, 1], [0, 1, 0, 0], [0, 1, 0, 0]]) # Star, root 2. Picture 11.
+As.append([[0, 0, 1, 0], [0, 0, 1, 0], [1, 1, 0, 1], [0, 0, 1, 0]]) # Star, root 3. Picture 6.
+As.append([[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [1, 1, 1, 0]]) # Star, root 4. Picture 10.
 As.append([[0, 1, 0, 0], [1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0]]) # Right Snake, 1-2-3-4/4-3-2-1. Picture 4. 
 As.append([[0, 1, 0, 1], [1, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]]) # Up Snake, 4-1-2-3/3-2-1-4. Picture 1.
 As.append([[0, 1, 0, 1], [1, 0, 0, 0], [0, 0, 0, 1], [1, 0, 1, 0]]) # Left Snake, 3-4-1-2/2-1-4-3. Picture 5.
 As.append([[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 1], [1, 0, 1, 0]]) # Down Snake, 2-3-4-1/1-4-3-2. Picture 8.
 As.append([[0, 0, 1, 0], [0, 0, 1, 1], [1, 1, 0, 0], [0, 1, 0, 0]]) # Right X, 1-3-2-4/4-2-3-1. Picture 13. 
 As.append([[0, 0, 1, 0], [0, 0, 0, 1], [1, 0, 0, 1], [0, 1, 1, 0]]) # Down X, 1-3-4-2/2-4-3-1. Picture 14. 
-As.append([[0, 0, 1, 1], [0, 0, 0, 1], [1, 0, 0, 0], [1, 1, 0, 0]]) # Left X, 2-4-1-3/3-1-4-2. Picture 15. 
+As.append([[0, 0, 1, 1], [0, 0, 0, 1], [1, 0, 0, 0], [1, 1, 0, 0]]) # Left X, 2-4-1-3/3-1-4-2. Picture 15.
 As.append([[0, 1, 1, 0], [1, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0]]) # Up X, 3-1-2-4/4-2-1-3. Picture 16. 
 As.append([[0, 0, 1, 1], [0, 0, 1, 0], [1, 1, 0, 0], [1, 0, 0, 0]]) # N, 4-1-3-2/2-3-1-4. Picture 3.
 As.append([[0, 1, 0, 0], [1, 0, 0, 1], [0, 0, 0, 1], [0, 1, 1, 0]]) # Z, 1-2-4-3/3-4-2-1. Picture 9.
@@ -56,5 +56,13 @@ for A in As:
 
     #plot.graph(A, N, is_directed)
 
+avg_r_ordered_index = sorted(range(len(avg_r)), key=lambda k: avg_r[k], reverse=True)
+avg_r_ordered = sorted(avg_r, reverse=True)
+#print(avg_r)
+#print(lengths)
+#print(avg_r_ordered_index)
+#print(avg_r_ordered)
 print(avg_r)
-print(lengths)
+
+#for i in avg_r_ordered_index:
+#    plot.graph(As[i], N, is_directed)

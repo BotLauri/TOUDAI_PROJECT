@@ -7,8 +7,8 @@ import plot
 # General parameters.
 N = 3 # Number of oscillators. 
 C = 2 # Number of connections. 
-K = C*2 # Coupling constant. 
-alpha = 0 # Phase shift. 
+K = C # Coupling constant. 
+alpha = -0.5 # Phase shift. 
 t_end = 200 # Calculation terminates at t = t_end.
 steps = 1000 # Number of time steps in simulation. 
 element_avg = int(steps*0.5) # Number of elements in the averaging over time (r_avg).
@@ -26,7 +26,7 @@ As = []
 As.append([[0, 1, 1], [1, 0, 0], [1, 0, 0]]) # 2-1-3/3-1-2. len 3.
 As.append([[0, 1, 0], [1, 0, 1], [0, 1, 0]]) # 1-2-3/3-2-1. len 3.
 As.append([[0, 0, 1], [0, 0, 1], [1, 1, 0]]) # 1-3-2/2-3-1. len 3.
-lengths = [3, 3, 3]
+networks = ['1 center', '2 center', '3 center']
 
 avg_r = []
 for A in As:
@@ -41,7 +41,8 @@ for A in As:
     #avg_r.append(round(np.sum(r_hist[:-element_avg])/element_avg, 2)) # Average of last elements of r(t).
     avg_r.append(np.sum(r_hist[:-element_avg])/element_avg) # Average of last elements of r(t).
 
-    #plot.graph(A, N, is_directed)
+    plot.graph(A, N, is_directed)
+    #plot.coupling(res, steps, N, C, K, alpha)
 
 print(avg_r)
-print(lengths)
+print(networks)

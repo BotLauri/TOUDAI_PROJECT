@@ -14,7 +14,10 @@ import optimize
 # Sort different networks by their optimal r values. 
 # Later maybe look at C?
 # Negative alpha -> nodes with most connections reverse order?
-# N!/2 + trees. (N!/2 are permutations minus mirror symmetry.)
+# Number of possible networks are: N!/2 + trees. (N!/2 are permutations minus mirror symmetry.)
+# Analytical solution + Taylor?
+# There are methods of adding/removing connections 
+# which cause the best results, however, here we will just add randomly. 
 
 # General parameters.
 N = 7 # Number of oscillators. 
