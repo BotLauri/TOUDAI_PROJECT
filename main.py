@@ -23,11 +23,11 @@ import optimize
 N = 7 # Number of oscillators. 
 C = (N - 1)*2 # Number of connections. 
 K = C*2 # Coupling constant. 
-alpha = 0.5 # Phase shift. 
+alpha = 0.1 # Phase shift. 
 t_end = 200 # Calculation terminates at t = t_end.
 steps = 1000 # Number of time steps in simulation. 
-iterations = 50 # Optimization iterations. 
-is_directed = False
+iterations = 100 # Optimization iterations. 
+is_directed = True
 
 # Initialization.
 #seed = 2022
